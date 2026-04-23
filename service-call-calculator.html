@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAS2U - Service Call Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     MAS2U - Service Call Calculator
+     Self-contained HTML file (CSS + JS embedded)
+     Drop this file content into a WordPress Custom HTML block.
+     ========================================================= */
+
+  :root {
+    --mas2u-green:        #2E7D32;
+    --mas2u-green-dark:   #1B5E20;
+    --mas2u-green-light:  #A5D6A7;
+    --mas2u-green-soft:   #E8F5E9;
+    --bg:                 #F0F2F5;
+    --card:               #FFFFFF;
+    --text:               #1C1C1C;
+    --text-muted:         #6B7280;
+    --border:             #E5E7EB;
+    --shadow:             0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg:          0 4px 16px rgba(0,0,0,0.10);
+    --radius:             10px;
+  }
+
+  /* Scope everything under a single wrapper so the styles don't
+     leak into the WordPress theme. */
+  .mas2u-calc * {
+    box-sizing: border-box;
+  }
+
+  .mas2u-calc {
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    padding: 24px 16px;
+    min-height: 100%;
+    line-height: 1.5;
+  }
+
+  .mas2u-calc .container {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  .mas2u-calc .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .mas2u-calc .header h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--mas2u-green-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.3px;
+  }
+  .mas2u-calc .header p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 14px;
+  }
+
+  /* ---------- Tabs ---------- */
+  .mas2u-calc .tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 6px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .mas2u-calc .tab {
+    flex: 1 1 auto;
+    min-width: 180px;
+    padding: 12px 18px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .mas2u-calc .tab:hover {
+    background: var(--mas2u-green-soft);
+    color: var(--mas2u-green-dark);
+  }
+  .mas2u-calc .tab.active {
+    background: var(--mas2u-green);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(46,125,50,0.3);
+  }
+
+  /* ---------- Grid layout ---------- */
+  .mas2u-calc .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 768px) {
+    .mas2u-calc .grid { grid-template-columns: 1fr; }
+  }
+
+  .mas2u-calc .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+  }
+  .mas2u-calc .card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--mas2u-green-dark);
+    margin: 0 0 18px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--mas2u-green-soft);
+  }
+
+  /* ---------- Form ---------- */
+  .mas2u-calc .field {
+    margin-bottom: 18px;
+  }
+  .mas2u-calc .field:last-child { margin-bottom: 0; }
+
+  .mas2u-calc label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .mas2u-calc input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .mas2u-calc input[type="number"]:focus {
+    outline: none;
+    border-color: var(--mas2u-green);
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
+  }
+  .mas2u-calc .hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .mas2u-calc .time-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mas2u-calc .time-row input[type="number"] {
+    flex: 1;
+  }
+  .mas2u-calc .time-sep {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-muted);
+    line-height: 1;
+    padding-bottom: 2px;
+    flex-shrink: 0;
+  }
+  .mas2u-calc .time-sublabels {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+  }
+  .mas2u-calc .time-sublabels span {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .mas2u-calc .time-sublabels .sep-spacer {
+    width: 22px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Summary table ---------- */
+  .mas2u-calc table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .mas2u-calc table th,
+  .mas2u-calc table td {
+    text-align: left;
+    padding: 10px 6px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mas2u-calc table th {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .mas2u-calc table td.right,
+  .mas2u-calc table th.right { text-align: right; }
+
+  .mas2u-calc .summary-breakdown {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--mas2u-green-soft);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--mas2u-green-dark);
+    font-weight: 500;
+  }
+  .mas2u-calc .summary-breakdown .line {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+  }
+  .mas2u-calc .summary-breakdown .line .lbl {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .mas2u-calc .total {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--mas2u-green);
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mas2u-calc .total .lbl {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+  }
+  .mas2u-calc .total .val {
+    font-size: 26px;
+    font-weight: 800;
+  }
+
+  /* ---------- Tab panel visibility ---------- */
+  .mas2u-calc .panel { display: none; }
+  .mas2u-calc .panel.active { display: block; }
+
+  /* ---------- Footer ---------- */
+  .mas2u-calc .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="mas2u-calc">
+  <div class="container">
+
+    <div class="header">
+      <h1>Service Call Calculator</h1>
+      <p>Internal billing tool &middot; MAS2U Mobile Repair</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="gas" role="tab">Service Call - Gas Vehicle</button>
+      <button class="tab" data-tab="emergency" role="tab">Emergency Labor</button>
+    </div>
+
+    <!-- ============== PANEL 1: GAS VEHICLE ============== -->
+    <div class="panel active" id="panel-gas">
+      <div class="grid">
+        <!-- Form -->
+        <div class="card">
+          <h2>Service Details</h2>
+          <div class="field">
+            <label>Travel Time (as per Google Maps)</label>
+            <div class="time-row">
+              <input type="number" id="gas-hours" min="0" step="1" placeholder="0" />
+              <span class="time-sep">:</span>
+              <input type="number" id="gas-minutes" min="0" max="59" step="1" placeholder="00" />
+            </div>
+            <div class="time-sublabels">
+              <span>Hours</span>
+              <span class="sep-spacer"></span>
+              <span>Minutes</span>
+            </div>
+            <div class="hint">Rounded up to the nearest 0.25 h increment.</div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="card">
+          <h2>Summary</h2>
+          <table>
+            <thead>
+              <tr><th>Name</th><th class="right">Total</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Service Call - Gas Vehicle</td>
+                <td class="right" id="gas-row-total">$0.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="summary-breakdown">
+            <div class="line"><span class="lbl">Minutes entered</span><span id="gas-bd-minutes">0</span></div>
+            <div class="line"><span class="lbl">Rounded interval</span><span id="gas-bd-interval">0.00 h</span></div>
+            <div class="line"><span class="lbl">Calculation</span><span id="gas-bd-calc">0.00 &times; $150</span></div>
+          </div>
+
+          <div class="total">
+            <span class="lbl">Total</span>
+            <span class="val" id="gas-total">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== PANEL 2: EMERGENCY LABOR ============== -->
+    <div class="panel" id="panel-emergency">
+      <div class="grid">
+        <!-- Form -->
+        <div class="card">
+          <h2>Emergency Details</h2>
+          <div class="field">
+            <label>Labor Time</label>
+            <div class="time-row">
+              <input type="number" id="em-hours" min="0" step="1" placeholder="0" />
+              <span class="time-sep">:</span>
+              <input type="number" id="em-minutes" min="0" max="59" step="1" placeholder="00" />
+            </div>
+            <div class="time-sublabels">
+              <span>Hours</span>
+              <span class="sep-spacer"></span>
+              <span>Minutes</span>
+            </div>
+            <div class="hint">Rounded up to the nearest 0.25 h increment.</div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="card">
+          <h2>Summary</h2>
+          <table>
+            <thead>
+              <tr><th>Name</th><th class="right">Total</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Emergency Labor</td>
+                <td class="right" id="em-row-total">$0.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="summary-breakdown">
+            <div class="line"><span class="lbl">Minutes entered</span><span id="em-bd-minutes">0</span></div>
+            <div class="line"><span class="lbl">Rounded interval</span><span id="em-bd-interval">0.00 h</span></div>
+            <div class="line"><span class="lbl">Calculation</span><span id="em-bd-calc">0.00 &times; $300</span></div>
+          </div>
+
+          <div class="total">
+            <span class="lbl">Total</span>
+            <span class="val" id="em-total">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      MAS2U &middot; 1598 Main Street, Whiteford, MD 21160
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   MAS2U SERVICE CALL CALCULATOR - CONFIGURATION
+   -------------------------------------------------------------------------
+   Edit the two rates below to update the hourly pricing used by the
+   calculator. Values are in US dollars per hour. No other code changes
+   are required.
+   ========================================================================= */
+   const RATE_SERVICE_CALL   = 150;   // $ per hour - Service Call (Gas Vehicle)
+   const RATE_EMERGENCY_LABOR = 300;  // $ per hour - Emergency Labor
+/* ========================================================================= */
+
+(function () {
+  'use strict';
+
+  /**
+   * Convert a raw minute count to hours, always rounding UP to the
+   * nearest 0.25 h increment.
+   *   1-15  min -> 0.25 h
+   *   16-30 min -> 0.50 h
+   *   31-45 min -> 0.75 h
+   *   46-60 min -> 1.00 h
+   *   ...and so on in 0.25 h steps.
+   * 0 (or less) minutes returns 0.
+   */
+  function minutesToRoundedHours(minutes) {
+    const m = Number(minutes);
+    if (!isFinite(m) || m <= 0) return 0;
+    const rawHours = m / 60;
+    return Math.ceil(rawHours / 0.25) * 0.25;
+  }
+
+  function formatMoney(n) {
+    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function formatHours(h) {
+    return h.toFixed(2) + ' h';
+  }
+
+  // ---------- Tabs ----------
+  const tabs = document.querySelectorAll('.mas2u-calc .tab');
+  const panels = document.querySelectorAll('.mas2u-calc .panel');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      const target = tab.getAttribute('data-tab');
+      tabs.forEach(function (t) { t.classList.remove('active'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('panel-' + target).classList.add('active');
+    });
+  });
+
+  // ---------- Panel 1: Gas Vehicle ----------
+  const gasHoursEl   = document.getElementById('gas-hours');
+  const gasMinutes   = document.getElementById('gas-minutes');
+  const gasBdMinutes = document.getElementById('gas-bd-minutes');
+  const gasBdInt     = document.getElementById('gas-bd-interval');
+  const gasBdCalc    = document.getElementById('gas-bd-calc');
+  const gasRowTotal  = document.getElementById('gas-row-total');
+  const gasTotal     = document.getElementById('gas-total');
+
+  function updateGas() {
+    const h    = Number(gasHoursEl.value) || 0;
+    const m    = Number(gasMinutes.value) || 0;
+    const totalMins = h * 60 + m;
+    const hours = minutesToRoundedHours(totalMins);
+    const total = hours * RATE_SERVICE_CALL;
+
+    gasBdMinutes.textContent = totalMins > 0 ? h + 'h ' + String(m).padStart(2, '0') + 'm' : '0h 00m';
+    gasBdInt.textContent     = formatHours(hours);
+    gasBdCalc.textContent    = hours.toFixed(2) + ' × $' + RATE_SERVICE_CALL;
+    gasRowTotal.textContent  = formatMoney(total);
+    gasTotal.textContent     = formatMoney(total);
+  }
+
+  gasHoursEl.addEventListener('input', updateGas);
+  gasMinutes.addEventListener('input', updateGas);
+
+  // ---------- Panel 2: Emergency Labor ----------
+  const emHoursEl   = document.getElementById('em-hours');
+  const emMinutes   = document.getElementById('em-minutes');
+  const emBdMinutes = document.getElementById('em-bd-minutes');
+  const emBdInt     = document.getElementById('em-bd-interval');
+  const emBdCalc    = document.getElementById('em-bd-calc');
+  const emRowTotal  = document.getElementById('em-row-total');
+  const emTotal     = document.getElementById('em-total');
+
+  function updateEmergency() {
+    const h    = Number(emHoursEl.value) || 0;
+    const m    = Number(emMinutes.value) || 0;
+    const totalMins = h * 60 + m;
+    const hours = minutesToRoundedHours(totalMins);
+    const total = hours * RATE_EMERGENCY_LABOR;
+
+    emBdMinutes.textContent = totalMins > 0 ? h + 'h ' + String(m).padStart(2, '0') + 'm' : '0h 00m';
+    emBdInt.textContent     = formatHours(hours);
+    emBdCalc.textContent    = hours.toFixed(2) + ' × $' + RATE_EMERGENCY_LABOR;
+    emRowTotal.textContent  = formatMoney(total);
+    emTotal.textContent     = formatMoney(total);
+  }
+
+  emHoursEl.addEventListener('input', updateEmergency);
+  emMinutes.addEventListener('input', updateEmergency);
+
+  // Initial render
+  updateGas();
+  updateEmergency();
+})();
+</script>
+
+</body>
+</html>
